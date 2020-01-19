@@ -8,6 +8,9 @@ def Scan(url):
     req_soup = soup(r.text, 'html5lib')
     out = []
 
+    # Debugging
+    print("GET : " + url)
+
     # Recupération de l'url
     out.append(url)
 
@@ -55,7 +58,7 @@ def GetAllReciepe(url):
 
 ##-------------------------------------------------------------------------- Main Code ---------------------------------
 
-final = []
+final = {}
 
 temp = {}
 
@@ -69,10 +72,23 @@ urls = {
 "boisson":"https://www.marmiton.org/recettes/?type=boisson"
 }
 
-for recette_type in urls:
-    temp[recette_type] = GetAllReciepe( urls[recette_type] )
+#for recette_type in urls:
+#    temp[recette_type] = GetAllReciepe( urls[recette_type] )
 
-with open("test.json","w",encoding="utf8") as file:
-    file.write(json.dumps(temp))
+with open("test.json","r",encoding="utf8") as file:
+    temp = json.loads(file.read())
 
+
+for recette_type in temp:
+    out = []
+    for url in temp[recette_type]:
+        out.append(Scan(url))
+    final[recette_type] = out
+
+#with open("test.csv","w",encoding="utf8") as file:
+#    file.write(json.dumps(temp))
+
+
+with open("test2.csv","w",encoding="utf8") as file:
+    file.write(json.dumps(final))
 
