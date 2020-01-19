@@ -58,37 +58,50 @@ def GetAllReciepe(url):
 
 ##-------------------------------------------------------------------------- Main Code ---------------------------------
 
-final = {}
+# Paramètres
+UpLib = True
+UpData = False
 
-temp = {}
+# Variables
+Data = {}
+Lib = {}
 
 urls = {
-"entree":"https://www.marmiton.org/recettes/?type=entree",
-"plat_principal":"https://www.marmiton.org/recettes/?type=platprincipal",
-"dessert":"https://www.marmiton.org/recettes/?type=dessert",
-"amuse_gueule":"https://www.marmiton.org/recettes/?type=amusegueule",
-"sauce":"https://www.marmiton.org/recettes/?type=sauce",
-"accompagnement":"https://www.marmiton.org/recettes/?type=accompagnement",
-"boisson":"https://www.marmiton.org/recettes/?type=boisson"
+    "entree": "https://www.marmiton.org/recettes/?type=entree",
+    "plat_principal": "https://www.marmiton.org/recettes/?type=platprincipal",
+    "dessert": "https://www.marmiton.org/recettes/?type=dessert",
+    "amuse_gueule": "https://www.marmiton.org/recettes/?type=amusegueule",
+    "sauce": "https://www.marmiton.org/recettes/?type=sauce",
+    "accompagnement": "https://www.marmiton.org/recettes/?type=accompagnement",
+    "boisson": "https://www.marmiton.org/recettes/?type=boisson"
 }
 
-#for recette_type in urls:
-#    temp[recette_type] = GetAllReciepe( urls[recette_type] )
+# Code
 
-with open("test.json","r",encoding="utf8") as file:
-    temp = json.loads(file.read())
+# Update de la Bibliothèque de recettes
+if UpLib:
+    for recette_type in urls:
+        Lib[recette_type] = GetAllReciepe(urls[recette_type])
 
+    with open("Lib.csv", "w", encoding="utf8") as file:
+        file.write(json.dumps(Lib))
 
-for recette_type in temp:
-    out = []
-    for url in temp[recette_type]:
-        out.append(Scan(url))
-    final[recette_type] = out
+else:
+    try:
+        with open("Lib.json", "r", encoding="utf8") as file:
+            Lib = json.loads(file.read())
+    except FileNotFoundError:
+        print("The Lib file coulnd't be found change the UpLib variable to vreate a new library.")
 
-#with open("test.csv","w",encoding="utf8") as file:
-#    file.write(json.dumps(temp))
+#Update des données de recettes.
+if UpData:
+    for recette_type in Lib:
+        out = []
+        for url in Lib[recette_type]:
+            out.append(Scan(url))
+        Data[recette_type] = out
 
+    with open("test2.csv", "w", encoding="utf8") as file:
+        file.write(json.dumps(Data))
 
-with open("test2.csv","w",encoding="utf8") as file:
-    file.write(json.dumps(final))
-
+print("Your Actions Have been Done !!! :)")
