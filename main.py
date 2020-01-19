@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup as soup
+import json
 
 ##-------------------------------------------------------------------------- Page Scanner ------------------------------
 def Scan(url):
@@ -19,29 +20,59 @@ def Scan(url):
     return out
 
 ##-------------------------------------------------------------------------- List Scanner ------------------------------
-def GetAllReciepe(n):
+def GetAllReciepe(url):
+    run = True
+    page = 1
     out = []
-    for i in range(1, n + 1):
-        print("Scanning Page " + str(i) + " out of " + str(n) + ".")
-        r = requests.get("https://www.marmiton.org/recettes/?type=entree=" + str(i))
-        soup = BeautifulSoup(r.text, 'html.parser')
-        for link in soup.find_all('a'):
-            if link.get('class') == ['recipe-card-link']:
-                print("Now Scanning " + link.get('href') + " ...")
-                out.append(ScanReciepe(link.get('href')))
+    last = []
+    now = []
+    while(run):
+        #
+        out += now
+        last = now
+        now = []
 
-    return out
-
-
-def WriteToFile(OList):
-    out = ""
-    for reciepe in OList:
-        out = out + reciepe[0] + "," + reciepe[1] + ",[" + reciepe[2] + "]\n"
-
-    print("Writing to File ...")
-    with open("/content/drive/My Drive/Colab Notebooks/750g Web Scraper/Final.txt", "w", encoding="utf8") as file:
-        file.write(out)
-    print("File Written")
+        # Chargement de la page
+        print("Scanning Page " + str(page) + ".")
+        req = requests.get(url + "&page=" + str(page)).text
+        req_soup = soup(req, 'html.parser')
 
 
-print(Scan("https://www.marmiton.org/recettes/recette_nouilles-sautees-aux-legumes-et-poulet-chine_23507.aspx"))
+        # Analyse de la page
+        for link in req_soup.find_all("a",{"class":"recipe-card-link"}):
+            now.append(link.get('href'))
+
+
+        # Stop detection
+        if last == now:
+            run = False
+        else:
+            page += 1
+
+    return(out)
+
+
+
+##-------------------------------------------------------------------------- Main Code ---------------------------------
+
+final = []
+
+temp = {}
+
+urls = {
+"entree":"https://www.marmiton.org/recettes/?type=entree",
+"plat_principal":"https://www.marmiton.org/recettes/?type=platprincipal",
+"dessert":"https://www.marmiton.org/recettes/?type=dessert",
+"amuse_gueule":"https://www.marmiton.org/recettes/?type=amusegueule",
+"sauce":"https://www.marmiton.org/recettes/?type=sauce",
+"accompagnement":"https://www.marmiton.org/recettes/?type=accompagnement",
+"boisson":"https://www.marmiton.org/recettes/?type=boisson"
+}
+
+for recette_type in urls:
+    temp[recette_type] = GetAllReciepe( urls[recette_type] )
+
+with open("test.csv","w",encoding="utf8") as file:
+    file.write(json.dumps(temp))
+
+
