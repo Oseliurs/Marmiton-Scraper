@@ -72,7 +72,7 @@ urls = {
 for recette_type in urls:
     temp[recette_type] = GetAllReciepe( urls[recette_type] )
 
-with open("test.csv","w",encoding="utf8") as file:
+with open("test.json","w",encoding="utf8") as file:
     file.write(json.dumps(temp))
 
 
