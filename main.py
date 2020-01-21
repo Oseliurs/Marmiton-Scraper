@@ -60,7 +60,7 @@ def GetAllReciepe(url):
 
 # Paramètres
 UpLib = True
-UpData = False
+UpData = True
 
 # Variables
 Data = {}
@@ -83,7 +83,7 @@ if UpLib:
     for recette_type in urls:
         Lib[recette_type] = GetAllReciepe(urls[recette_type])
 
-    with open("Lib.csv", "w", encoding="utf8") as file:
+    with open("Lib.json", "w", encoding="utf8") as file:
         file.write(json.dumps(Lib))
 
 else:
@@ -101,7 +101,7 @@ if UpData:
             out.append(Scan(url))
         Data[recette_type] = out
 
-    with open("test2.csv", "w", encoding="utf8") as file:
+    with open("Data.json", "w", encoding="utf8") as file:
         file.write(json.dumps(Data))
 
 print("Your Actions Have been Done !!! :)")
