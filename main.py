@@ -9,7 +9,7 @@ def Scan(url):
     out = []
 
     # Debugging
-    print("GET : " + url)
+    #print("GET : " + url)
 
     # Recupération de l'url
     out.append(url)
@@ -54,12 +54,20 @@ def GetAllReciepe(url):
 
     return(out)
 
+# Count the amount of receipes
+def Count(Lib):
+    amount = 0
+    for type in Lib:
+        for receipe in Lib[type]:
+            amount += 1
+
+    return amount
 
 
 ##-------------------------------------------------------------------------- Main Code ---------------------------------
 
 # Paramètres
-UpLib = True
+UpLib = False
 UpData = True
 
 # Variables
@@ -86,19 +94,26 @@ if UpLib:
     with open("Lib.json", "w", encoding="utf8") as file:
         file.write(json.dumps(Lib))
 
+    print("There is " + str(Count(Lib)) + " receipe in this Library.")
+
 else:
     try:
         with open("Lib.json", "r", encoding="utf8") as file:
             Lib = json.loads(file.read())
+        print("There is " + str(Count(Lib)) + " receipe in this Library.")
     except FileNotFoundError:
         print("The Lib file coulnd't be found change the UpLib variable to vreate a new library.")
 
 #Update des données de recettes.
 if UpData:
+    total = Count(Lib)
+    now = 0
     for recette_type in Lib:
         out = []
         for url in Lib[recette_type]:
             out.append(Scan(url))
+            now += 1
+            print("ETA: " + str( round(now/total*100,3) ) + " %")
         Data[recette_type] = out
 
     with open("Data.json", "w", encoding="utf8") as file:
